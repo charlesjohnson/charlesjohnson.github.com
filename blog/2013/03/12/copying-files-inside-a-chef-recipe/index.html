@@ -9,7 +9,7 @@
   <meta name="author" content="Charles Johnson">
 
   
-  <meta name="description" content="It&#8217;s always been a little puzzling to me that while Chef has the remote_file resource for copying files from remote hosts to local, it doesn&# &hellip;">
+  <meta name="description" content="It&#8217;s a little puzzling to me that while Chef has the remote_file resource for copying files from remote hosts to local, it doesn&#8217;t have a &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -91,7 +91,7 @@
   </header>
 
 
-<div class="entry-content"><p>It&#8217;s always been a little puzzling to me that while Chef has the <a href="http://docs.opscode.com/chef/resources.html#remote_file">remote_file</a> resource for copying files from remote hosts to local, it doesn&#8217;t have a similar mechanism in the <a href="http://docs.opscode.com/chef/resources.html#remote_file">file</a> resource to allow for copying files from one location on the local host to another as part of a recipe. As a deploy pattern unnecessary file copies should be discouraged, but sometimes it&#8217;s just necessary to copy a file once it&#8217;s been placed on the system at another location by an outside actor. One good example of this is when using a <a href="http://www.vagrantup.com">Vagrant</a> guest with the <a href="http://docs-v1.vagrantup.com/v1/docs/provisioners/chef_server.html">Chef-Server</a> provisioner and the <a href="http://community.opscode.com/cookbooks/chef-client">chef-client</a> cookbook.</p>
+<div class="entry-content"><p>It&#8217;s a little puzzling to me that while Chef has the <a href="http://docs.opscode.com/chef/resources.html#remote_file">remote_file</a> resource for copying files from remote hosts to local, it doesn&#8217;t have a similar mechanism in the <a href="http://docs.opscode.com/chef/resources.html#remote_file">file</a> resource to allow for copying files from one location on the local host to another as part of a recipe. As a deploy pattern unnecessary file copies should be discouraged, but sometimes it&#8217;s just necessary to copy a file once it&#8217;s been placed on the system at another location by an outside actor. One good example of this is when using a <a href="http://www.vagrantup.com">Vagrant</a> guest with the <a href="http://docs-v1.vagrantup.com/v1/docs/provisioners/chef_server.html">Chef-Server</a> provisioner and the <a href="http://community.opscode.com/cookbooks/chef-client">chef-client</a> cookbook.</p>
 
 <p>When Vagrant starts a run using the Chef-Server provisioner, it writes out a <code>client.rb</code> file to the guest at <code>/tmp/vagrant-chef-1/client.rb</code>, and then starts a single run of chef-client with the <code>-c /tmp/vagrant-chef-1/client.rb</code> command-line flag, telling it to look for the config file in the irregular location. When run without that flag, chef-client looks for the file at the default location, <code>/etc/chef/client.rb</code>.</p>
 

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Vagrant | TODO: Come Up With Clever Title]]></title>
+  <link href="http://charlesjohnson.github.com/blog/categories/vagrant/atom.xml" rel="self"/>
+  <link href="http://charlesjohnson.github.com/"/>
+  <updated>2013-03-12T18:11:34-07:00</updated>
+  <id>http://charlesjohnson.github.com/</id>
+  <author>
+    <name><![CDATA[Charles Johnson]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Copying Files Inside A Chef Recipe]]></title>
+    <link href="http://charlesjohnson.github.com/blog/2013/03/12/copying-files-inside-a-chef-recipe/"/>
+    <updated>2013-03-12T16:54:00-07:00</updated>
+    <id>http://charlesjohnson.github.com/blog/2013/03/12/copying-files-inside-a-chef-recipe</id>
+    <content type="html"><![CDATA[<p>It's always been a little puzzling to me that while Chef has the <a href="http://docs.opscode.com/chef/resources.html#remote_file">remote_file</a> resource for copying files from remote hosts to local, it doesn't have a similar mechanism in the <a href="http://docs.opscode.com/chef/resources.html#remote_file">file</a> resource to allow for copying files from one location on the local host to another as part of a recipe. As a deploy pattern unnecessary file copies should be discouraged, but sometimes it's just necessary to copy a file once it's been placed on the system at another location by an outside actor. One good example of this is when using a <a href="http://www.vagrantup.com">Vagrant</a> guest with the <a href="http://docs-v1.vagrantup.com/v1/docs/provisioners/chef_server.html">Chef-Server</a> provisioner and the <a href="http://community.opscode.com/cookbooks/chef-client">chef-client</a> cookbook.</p>
+
+<p>When Vagrant starts a run using the Chef-Server provisioner, it writes out a <code>client.rb</code> file to the guest at <code>/tmp/vagrant-chef-1/client.rb</code>, and then starts a single run of chef-client with the <code>-c /tmp/vagrant-chef-1/client.rb</code> command-line flag, telling it to look for the config file in the irregular location. When run without that flag, chef-client looks for the file at the default location, <code>/etc/chef/client.rb</code>.</p>
+
+<p>But what if the recipe being tested with Vagrant adds <code>recipe[chef-client::service]</code> to the node's run_list? Vagrant will start an instance of chef-client, using the Vagrant-generated client.rb file at <code>/tmp/vagrant-chef-1/client.rb</code>. When this copy of chef-client runs the chef-client::service recipe, the Vagrant-instantiated copy of chef-client will try to start a second, daemonized copy of chef-client as a service, this time without the -c flag. The second copy of chef-client will look for the config file at <code>/etc/chef/client.rb</code>, but because the config is not there, the provisioner will exit with an error.</p>
+
+<p>This makes it tricky to test code that install Chef-client as a service using Vagrant, because Vagrant writes out the <code>client.rb</code> file to /tmp, which isn't a suitable place to hold long-term data in any environment. Unlike Vagrant's <a href="http://docs-v1.vagrantup.com/v1/docs/provisioners/chef_solo.html">Chef-Solo</a> provisioner, it's impossible to inject node attributes directly via the Vagrantfile with the Chef-Server provisioner, so we can't easily write an exception into the Vagrantfile itself. Either a more complicated workflow must be devised to set the <code>["chef_client"]["conf_dir"]</code> attribute to point to <code>/tmp/vagrant-chef-1</code>, or (more simply) the client.rb file should be copied to <code>/etc/chef/client.rb</code> prior to running the <code>chef-client::service</code> recipe.</p>
+
+<p>Here's a code block that should take care of this use case, with values hard-coded for readability:</p>
+
+<p>```ruby
+if ::File.exist?("/tmp/vagrant-chef-1/client.rb")
+  ruby_block "copy Chef config file if running in a Vagrant guest" do
+   block do</p>
+
+<pre><code>::FileUtils.cp "/tmp/vagrant-chef-1/client.rb", "/etc/chef/client.rb"
+</code></pre>
+
+<p>   end
+   if ::File.exist?("/etc/chef/client.rb")</p>
+
+<pre><code> not_if { ::FileUtils.compare_file("/tmp/vagrant-chef-1/client.rb", "/etc/chef/client.rb") }
+</code></pre>
+
+<p>   end
+  end
+end
+```</p>
+
+<p>What this does: First check to see if the source file exists. If it does, check to see if the target file exists. If both files exist, then compare them to see if they are identical. If the files are not identical, or if the target file does not exist, then copy the source file to the target file location, overwriting the target file if present. In all other cases, do nothing.</p>
+
+<p>Drop this in before the <code>chef-client::service</code> recipe, and the Vagrant provision run will now complete, because the Chef-client service will be able to start.</p>
+
+<p>One note: While I haven't done any direct testing, it looks like Ruby's <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/fileutils/rdoc/FileUtils.html#method-c-compare_file_">FileUtils.compare_file()</a> method works by streaming both files and comparing them, so it should work with binaries. However, I could imagine this being very memory-hungry if attempted with large files. Or maybe not? I'm a lousy Rubyist.</p>
+]]></content>
+  </entry>
+  
+</feed>

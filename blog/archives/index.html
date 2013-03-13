@@ -10,7 +10,7 @@
 
   
   <meta name="description" content="Blog Archive 2013 Copying Files as Part of a Chef Recipe
-Mar 12 2013 posted in Chef, Vagrant, chef-client, tableflip About Me Charles Johnson (@ &hellip;">
+Mar 12 2013 posted in Chef, Vagrant, chef-client, tableflip About Me Professional Opscode &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -114,41 +114,15 @@ Mar 12 2013 posted in Chef, Vagrant, chef-client, tableflip About Me Charles Joh
   
     
 <section>
-  <h1>About Me</h1>
-  <div id="twitter-profile" style="margin-top:0.5em;">
-    <p>
-      <strong>Charles Johnson</strong> 
-      (<a href="http://twitter.com/chipadeedoodah">@chipadeedoodah</a>)
-    </p>
-    <p>Yet Another Goddamned Tech Blog</p>
-  </div>
-  <script type="text/javascript">
-    $.domReady(function(){
-        var container = $('#twitter-profile'),
-            user = "chipadeedoodah";
-        
-        function parseTwLinks(s) {
-          var twUrl = "http://www.twitter.com/"
-          s = s.replace(/ (@([\w]+))/g, function(match, p1, p2) {
-              return " <a href='"+twUrl+p2+"'>"+p1+"</a>"
-          }).replace(/ (#([\w]+))/g, function(match, p1, p2) {
-              return " <a href='"+twUrl+"#!/search?q=%23"+p2+"'>"+p1+"</a>"
-          })
-          return s
-        }
-
-        $.ajax({
-            url: "http://api.twitter.com/1/users/show.json?include_entities=false&screen_name="+user+"&callback=?"
-          , type: 'jsonp'
-          , error: function (err) { $('#twitter-profile').addClass('error');  }
-          , success: function(data) {
-              container.html('<img class="left" src="http://api.twitter.com/1/users/profile_image/'+user+'.json?size=bigger" alt="@'+user+'"><p><strong>'+data.name+'</strong> (<a href="http://twitter.com/'+user+'">@'+user+'</a>)<br/>'+data.location+'</p><p>'+parseTwLinks(data.description)+'</p>');
-            }
-        })
-      });
-  </script>
+	<span>
+		<img src="http://www.gravatar.com/avatar/5aef5f1a09643f748ab29690668a9d30" alt="Gravatar of Charles Johnson " title="Gravatar of Charles Johnson" />
+	</span>
 </section>
 
+<section>
+  <h1>About Me</h1>
+  <p>Professional Opscode Chef enthusiast by day, not-computer-things by night.</p>
+</section>
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chef | TODO: Come Up With Clever Title]]></title>
   <link href="http://charlesjohnson.github.com/blog/categories/chef/atom.xml" rel="self"/>
   <link href="http://charlesjohnson.github.com/"/>
-  <updated>2013-03-16T22:13:45-07:00</updated>
+  <updated>2013-03-16T22:15:15-07:00</updated>
   <id>http://charlesjohnson.github.com/</id>
   <author>
     <name><![CDATA[Charles Johnson]]></name>
@@ -22,7 +22,7 @@
 
 <p>When run without any flags, chef-client looks for configuration at the default location, <code>/etc/chef/client.rb</code>. However, when Vagrant starts a run using the Chef-Server provisioner, it writes out a <code>client.rb</code> file to the guest at <code>/tmp/vagrant-chef-1/client.rb</code>, and then starts a single run of chef-client with the <code>-c /tmp/vagrant-chef-1/client.rb</code> command-line flag, telling it to look for the config file in the irregular location.</p>
 
-<p>But what if the recipe being tested with Vagrant adds <code>recipe[chef-client::service]</code> to the node's run_list? Vagrant will start an instance of chef-client, using the Vagrant-generated client.rb file at <code>/tmp/vagrant-chef-1/client.rb</code>. When this copy of chef-client runs the chef-client::service recipe, the Vagrant-instantiated copy of chef-client will try to start a second, daemonized copy of chef-client as a service, this time without the -c flag. The second copy of chef-client will look for the config file at <code>/etc/chef/client.rb</code>, but because no config file has been placed there, the provisioner will exit with an error.</p>
+<p>But what if the recipe being tested with Vagrant adds <code>recipe[chef-client::service]</code> to the node's run_list? <!--more-->Vagrant will start an instance of chef-client, using the Vagrant-generated client.rb file at <code>/tmp/vagrant-chef-1/client.rb</code>. When this copy of chef-client runs the chef-client::service recipe, the Vagrant-instantiated copy of chef-client will try to start a second, daemonized copy of chef-client as a service, this time without the -c flag. The second copy of chef-client will look for the config file at <code>/etc/chef/client.rb</code>, but because no config file has been placed there, the provisioner will exit with an error.</p>
 
 <p>This makes it tricky to use Vagrant to test code that starts Chef-client as a service, because Vagrant writes out the <code>client.rb</code> file to /tmp, which isn't a suitable place to hold long-term data in any environment. Unlike Vagrant's <a href="http://docs-v1.vagrantup.com/v1/docs/provisioners/chef_solo.html">Chef-Solo</a> provisioner, it's impossible to inject node attributes directly via the Vagrantfile with the Chef-Server provisioner, so we can't easily write an exception into the Vagrantfile itself. Either a more complicated workflow must be devised to set the <code>["chef_client"]["conf_dir"]</code> attribute to point to <code>/tmp/vagrant-chef-1</code>, or (more simply) the client.rb file should be copied to <code>/etc/chef/client.rb</code> prior to running the <code>chef-client::service</code> recipe.</p>
 

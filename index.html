@@ -123,7 +123,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>However, when chef-client is started as a daemon by the <code>chef-client::service</code> recipe, chef-client looks for configuration at the location <code>#{node['chef-client']['conf_dir']}/client.rb</code>, which defaults to <code>/etc/chef/client.rb.</code> So what happens if the recipe being tested with Vagrant adds <code>recipe[chef-client::service]</code> to the node&#8217;s run_list?</div>
+<p>By contrast, when chef-client is started as a daemon by the <code>chef-client::service</code> recipe, chef-client looks for configuration at the location <code>#{node['chef-client']['conf_dir']}/client.rb</code>, which defaults to <code>/etc/chef/client.rb.</code> So what happens if the recipe being tested with Vagrant adds <code>recipe[chef-client::service]</code> to the node&#8217;s run_list?</div>
   
   
     <footer>

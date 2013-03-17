@@ -120,7 +120,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>However, when chef-client is started as a daemon by the <code>chef-client::service</code> recipe, chef-client looks for configuration at the location <code>#{node['chef-client']['conf_dir']}/client.rb</code>, which defaults to <code>/etc/chef/client.rb.</code> So what happens if the recipe being tested with Vagrant adds <code>recipe[chef-client::service]</code> to the node&#8217;s run_list?<!--more--></p>
+<p>By contrast, when chef-client is started as a daemon by the <code>chef-client::service</code> recipe, chef-client looks for configuration at the location <code>#{node['chef-client']['conf_dir']}/client.rb</code>, which defaults to <code>/etc/chef/client.rb.</code> So what happens if the recipe being tested with Vagrant adds <code>recipe[chef-client::service]</code> to the node&#8217;s run_list?<!--more--></p>
 
 <p><a href="http://i.imgur.com/wMT8GvR"><img class="center" src="http://i.imgur.com/wMT8GvR.png" width="576" height="539" title="Chef provisioner flowchart" alt="A flowchart diagram of Vagrant running chef-client with the chef-server provisioner"></a></p>
 
@@ -155,7 +155,7 @@
 
 <p>What this does: First check to see if the source file exists. If it does, check to see if the target file exists. If both files exist, then compare them to see if they are identical. If the files are not identical, or if the target file does not exist, then copy the source file to the target file location, overwriting the target file if present. In all other cases, do nothing.</p>
 
-<p>Drop this in a recipe that&#8217;s included before the <code>chef-client::service</code> recipe as part of the run_list in the Vagrantfile, and the Vagrant provision run will now complete. <strong>Be careful, there are security implications here!</strong> Because <code>/tmp</code> is typically world-writeable, we can&#8217;t rely on Vagrant being the only outside actor to leave a client.rb at this location. Proceed with caution.</p>
+<p>Drop this in a recipe that&#8217;s included before the <code>chef-client::service</code> recipe as part of the run_list in the Vagrantfile, and the Vagrant provision run will now complete. <strong>Be careful, there are security implications in this example!</strong> The code itself is fine, but because <code>/tmp</code> is typically world-writeable, we can&#8217;t rely on Vagrant being the only outside actor to leave a client.rb at this location. Proceed with caution. This is a good example of why copying files as part of a recipe is usually discouraged.</p>
 
 <p>One note: While I haven&#8217;t done any direct testing, it looks like Ruby&#8217;s <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/fileutils/rdoc/FileUtils.html#method-c-compare_file_">FileUtils.compare_file()</a> method works by streaming both files and comparing them, so it should work with binaries. However, I could imagine this being very memory-hungry if attempted with large files. Or maybe not? I&#8217;m a lousy Rubyist.</p>
 </div>

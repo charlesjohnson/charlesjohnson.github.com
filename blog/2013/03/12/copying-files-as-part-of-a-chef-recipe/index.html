@@ -126,7 +126,7 @@
 
 <p>The Vagrant provisioner will generate a client.rb file at <code>/tmp/vagrant-chef-1/client.rb</code>, and then start an instance of chef-client using this configuration file. When the provisioning instance of chef-client converges the <code>chef-client::service</code> recipe, it will try to start a second, daemonized copy of chef-client via an init script. This second instance of chef-client will look for configuration at the location <code>#{node['chef-client']['conf_dir']}/client.rb</code>, which defaults to <code>/etc/chef/client.rb</code>. But because there is no config file at this location, the service will not start, the provisioning chef-client run will exit with an error, and the vagrant provision will fail.</p>
 
-<p>It&#8217;s tricky to use Vagrant to test code that starts chef-client as a service during the provisioner. To fix this issue, we have to either tell the daemonized instance of chef-client to look for the configuration file in another location, or we have to copy the configuration file to the location that the daemon is expecting. It turns out that redirecting the daemon by changing the attribute isn&#8217;t the best choice: Unlike Vagrant&#8217;s <a href="http://docs-v1.vagrantup.com/v1/docs/provisioners/chef_solo.html">Chef-Solo</a> provisioner, it&#8217;s not possible to inject node attributes directly into the Chef-Server provisioner&#8217;s run via the Vagrantfile. In addition, because Vagrant writes out the <code>client.rb</code> file to <code>/tmp/vagrant-chef-1/client.rb</code>, setting the attribute to this location would set an uncomfortable (and unwise) precedent. So instead, the best solution is arguably to wait until Vagrant writes out the configuration file at <code>/tmp/vagrant-chef-1/client.rb</code>, and then copy it to <code>/etc/chef/client.rb</code> before attempting to converge the <code>chef-cent::service</code> recipe.</p>
+<p>It&#8217;s tricky to use Vagrant to test code that starts chef-client as a service during the provisioner. To fix this issue, we have to either tell the daemonized instance of chef-client to look for the configuration file in another location, or we have to copy the configuration file to the location that the daemon is expecting. It turns out that redirecting the daemon by changing the attribute isn&#8217;t the best choice: Unlike Vagrant&#8217;s <a href="http://docs-v1.vagrantup.com/v1/docs/provisioners/chef_solo.html">Chef-Solo</a> provisioner, it&#8217;s not possible to inject node attributes directly into the Chef-Server provisioner&#8217;s run via the Vagrantfile. In addition, because Vagrant writes out the <code>client.rb</code> file to <code>/tmp/vagrant-chef-1/client.rb</code>, setting the attribute to this location would set an uncomfortable (and unwise) precedent. So instead, the best solution is to wait until Vagrant writes out the configuration file at <code>/tmp/vagrant-chef-1/client.rb</code>, and then copy it to <code>/etc/chef/client.rb</code> before attempting to converge the <code>chef-clientent::service</code> recipe.</p>
 
 <p>This code should should take care of this use case. It assumes that the attribute <code>node['chef-client']['conf_dir']</code> has been set.</p>
 
@@ -206,6 +206,8 @@
     <p class="meta">
       
       
+        <a class="basic-alignment right" href="/blog/2013/03/17/in-defense-of-port-22/" title="Next Post: In Defense of Port 22">In Defense of Port 22 &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -228,6 +230,10 @@
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/03/17/in-defense-of-port-22/">In Defense of Port 22</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/03/12/copying-files-as-part-of-a-chef-recipe/">Copying Files as Part of a Chef Recipe</a>

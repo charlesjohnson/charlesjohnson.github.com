@@ -4,7 +4,7 @@
   <title><![CDATA[TODO: Come Up With Clever Title]]></title>
   <link href="http://charlesjohnson.github.com/atom.xml" rel="self"/>
   <link href="http://charlesjohnson.github.com/"/>
-  <updated>2013-03-18T08:47:01-07:00</updated>
+  <updated>2013-03-18T08:49:15-07:00</updated>
   <id>http://charlesjohnson.github.com/</id>
   <author>
     <name><![CDATA[Charles Johnson]]></name>
@@ -12,23 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[In Defense of Port 22]]></title>
-    <link href="http://charlesjohnson.github.com/blog/2013/03/17/in-defense-of-port-22/"/>
-    <updated>2013-03-17T09:03:00-07:00</updated>
-    <id>http://charlesjohnson.github.com/blog/2013/03/17/in-defense-of-port-22</id>
-    <content type="html"><![CDATA[<p>Intro &#8211;> Thesis: Moving the OpenSSH daemon off of port 22 increases risk and cost, to little benefit.</p>
-
-<p>Paragraph 1: Changing to a non-standard port does not decrease risk.</p>
-
-<p>Paragraph 2: Changing to a non-standard port may increase risk.</p>
-
-<p>Paragraph 3: Changing to a non-standard port increases cost.</p>
-
-<p>Conclusion: Because it does not decrease risk, might increase risk, and definitely increases cost, switching the openssh service to another port is a bad idea.</p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Copying Files as Part of a Chef Recipe]]></title>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Vagrant | TODO: Come Up With Clever Title]]></title>
   <link href="http://charlesjohnson.github.com/blog/categories/vagrant/atom.xml" rel="self"/>
   <link href="http://charlesjohnson.github.com/"/>
-  <updated>2013-03-18T08:49:15-07:00</updated>
+  <updated>2013-06-10T18:11:49-07:00</updated>
   <id>http://charlesjohnson.github.com/</id>
   <author>
     <name><![CDATA[Charles Johnson]]></name>
@@ -12,6 +12,137 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Understanding Chef Testing Part 1]]></title>
+    <link href="http://charlesjohnson.github.com/blog/2013/06/10/understanding-chef-testing-part-1/"/>
+    <updated>2013-06-10T18:10:00-07:00</updated>
+    <id>http://charlesjohnson.github.com/blog/2013/06/10/understanding-chef-testing-part-1</id>
+    <content type="html"><![CDATA[<p>This post is intended to be the first of a multi-part series on testing Chef code. This opening article will be 100% theory, talking about the whys and wherefores of testing when devising Chef-based automation. Subsequent posts will explore some of the different testing frameworks and tools available, along with practical examples of use.</p>
+
+<p>Let's dive in!</p>
+
+<h1>Definition of Terms</h1>
+
+<p>Before we begin, it may be useful to review some Chef terminology.</p>
+
+<ul>
+<li><strong>Resource</strong>: Any statement made in the Chef DSL is called a Resource. Resources are declarative. A full list of the Resources available in Chef is available on the Opscode <a href="http://docs.opscode.com/chef/resources.html">documentation site</a>. Here's an example resource:</li>
+</ul>
+
+
+<p><code>ruby
+package "apache2" do
+  action :install
+end
+</code></p>
+
+<ul>
+<li><p><strong>Provider</strong>: A Provider is the code that Chef runs under the hood to turn a Resource into reality. In the example resource above, we never specified to Chef that it should "Fetch a tarball," "Install an RPM," or "Run apt-get." Instead, the Chef interpreter inspects the system and determines which Provider will be most appropriate to satisfy the resource. The Opscode documentation site provides a <a href="http://docs.opscode.com/chef/resources.html#id155">list of all the providers available to the each resource</a>.</p></li>
+<li><p><strong>Recipe</strong>: A recipe is a collection of Chef Resources and Ruby code, evaluated in order, from top-to-bottom. Example recipe (<a href="http://community.opscode.com/cookbooks/zsh/source">Taken from the zsh cookbook</a>):</p></li>
+</ul>
+
+
+<p>```ruby
+package "zsh" do
+  action :install
+end</p>
+
+<p>case node['platform_family']
+when "debian"
+  package "zsh-doc" do</p>
+
+<pre><code>action :install
+</code></pre>
+
+<p>  end
+when "rhel", "fedora"
+  package "zsh-html" do</p>
+
+<pre><code>action :install
+</code></pre>
+
+<p>  end
+end
+```
+* <strong>Cookbook</strong>: A cookbook is a package of Chef code. Cookbooks include recipes, templates, libraries, attributes, and all the other data and logic necessary to interact with some piece of functionality on a server. Typical cookbooks include <a href="http://community.opscode.com/cookbooks/java">Java</a>, <a href="http://community.opscode.com/cookbooks/nginx">Nginx</a>, <a href="http://community.opscode.com/cookbooks/zsh/source">ZSH</a> or <a href="http://community.opscode.com/cookbooks/tomcat">Tomcat</a>.</p>
+
+<ul>
+<li><strong>Unit Test</strong>: Dictionary definitions are lazy, but here's one anyway. From <a href="https://en.wikipedia.org/wiki/Unit_testing">Wikipedia</a>:
+
+<blockquote><p>unit testing is a method by which <strong>individual units of source code</strong>, sets of one or more computer program modules together with <strong>associated control data, usage procedures, and operating procedures</strong>, are tested to determine if they are <strong>fit for use</strong>. Intuitively, one can view a unit as the <strong>smallest testable part of an application</strong>. (<em>emphasis added</em>)</p></blockquote></li>
+</ul>
+
+
+<p>With all these terms in mind, let's look at the logic behind Chef testing.</p>
+
+<h1>Chef Testing Strategy</h1>
+
+<p>When devising a testing strategy for Chef code, there are two important questions to answer:</p>
+
+<ol>
+<li><strong>When to test</strong>: At which point in the <strong>process</strong> of code execution will testing yield the most <strong>informative &amp; actionable</strong> results about the <strong>fitness</strong> of <em>“associated control data, usage procedures, and operating procedures?”</em></li>
+<li><strong>What to test</strong>: What to test: What is the <strong>smallest</strong> <em>individual unit of source code</em> that will yield <strong>informative &amp; actionable</strong> results data about <strong>fitness for use?</strong></li>
+</ol>
+
+
+<p>Because Chef is a declarative language, the answers to these questions become inextricable.</p>
+
+<h2>When To Test?</h2>
+
+<p>There are three points at which one can test Chef code:</p>
+
+<ul>
+<li>Signal Input
+
+<ul>
+<li>Did I <strong>send</strong> Chef the correct <strong>command</strong>?</li>
+</ul>
+</li>
+<li>Signal Processing
+
+<ul>
+<li>Did Chef <strong>interpret</strong> and <strong>execute</strong> my <strong>command</strong> correctly?</li>
+</ul>
+</li>
+<li>Signal Output
+
+<ul>
+<li>Did my <strong>command</strong>, <strong>executed</strong> by Chef, <strong>achieve</strong> my desired <strong>result</strong>?</li>
+</ul>
+</li>
+</ul>
+
+
+<p>But at which of these points will we get the most interesting data? The answer to this question lies in...</p>
+
+<h2>What To Test?</h2>
+
+<p>We know that our unit tests exist to "verify the fitness of individual units of source code."" But in the context of Chef, what <em>is</em> the individual unit of source code? This is where it gets tricky:</p>
+
+<p>Because of Chef’s Resource &amp; Provider model, Chef itself is a testing engine. Either the intent expressed in any given resource is executed, or the Chef run fails!</p>
+
+<p>For example (assuming a clean test environment):
+<code>ruby
+package "apache2" do
+  action :install
+end
+</code>
+Because <strong>Opscode tests Chef</strong>, we know that this resource will work. Either this code will install the apache2 package, or Chef will throw a stack trace. We don't have to test every resource declaration in our recipes over again!</p>
+
+<p>This reveals two best practices when testing Chef code:</p>
+
+<ol>
+<li><p>The unit of test is the intent of the recipe. Instead of testing each individual resource in a recipe, <strong>test only those resources that best reflect the intent of the recipe</strong>.</p></li>
+<li><p>Because we know that Chef resources will correctly interpret intent, there is no need to test the signal processing phase. Instead of worrying about whether Chef resources will correctly interpret intent, ensure that <strong>the intent is correctly expressed</strong>, and that <strong>the expressed intent achieves the desired goal when processed by Chef</strong>.</p></li>
+</ol>
+
+
+<h2>Next time</h2>
+
+<p>We'll discuss the planet Magrathea, and how a proper understanding of unit testing with declarative languages could have helped the Magratheans save a lot of time and effort.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Copying Files as Part of a Chef Recipe]]></title>

@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>TODO: Come Up With Clever Title</title>
+  <title>Understanding Chef Testing Part 1 - TODO: Come Up With Clever Title</title>
   <meta name="author" content="Charles Johnson">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://charlesjohnson.github.com">
+  <link rel="canonical" href="http://charlesjohnson.github.com/blog/2013/06/10/understanding-chef-testing-part-1">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="TODO: Come Up With Clever Title" type="application/atom+xml">
@@ -75,15 +75,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/06/10/understanding-chef-testing-part-1/">Understanding Chef Testing Part 1</a></h1>
+      <h1 class="entry-title">Understanding Chef Testing Part 1</h1>
     
     
       <p class="meta">
@@ -101,14 +98,14 @@
 
 <time datetime="2013-06-10T18:10:00-07:00" pubdate data-updated="true">Jun 10<span>th</span>, 2013</time>
         
-         | <a href="/blog/2013/06/10/understanding-chef-testing-part-1/#disqus_thread">Comments</a>
+         | <a href="#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>This post is intended to be the first of a multi-part series on testing Chef code. This opening article will be 100% theory, talking about the whys and wherefores of testing when devising Chef-based automation. Subsequent posts will explore some of the different testing frameworks and tools available, along with practical examples of use.</p>
+<div class="entry-content"><p>This post is intended to be the first of a multi-part series on testing Chef code. This opening article will be 100% theory, talking about the whys and wherefores of testing when devising Chef-based automation. Subsequent posts will explore some of the different testing frameworks and tools available, along with practical examples of use.</p>
 
 <p>Let&#8217;s dive in!</p>
 
@@ -248,22 +245,16 @@
 
 <p>We&#8217;ll discuss the planet Magrathea, and how a proper understanding of unit testing with declarative languages could have helped the Magratheans save a lot of time and effort.</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/03/12/copying-files-as-part-of-a-chef-recipe/">Copying Files as Part of a Chef Recipe</a></h1>
-    
-    
-      <p class="meta">
-        
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Charles Johnson</span></span>
+
+      
 
 
 
@@ -275,47 +266,46 @@
   
 
 
-<time datetime="2013-03-12T16:54:00-07:00" pubdate data-updated="true">Mar 12<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/03/12/copying-files-as-part-of-a-chef-recipe/#disqus_thread">Comments</a>
-        
-      </p>
+<time datetime="2013-06-10T18:10:00-07:00" pubdate data-updated="true">Jun 10<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/chef/'>Chef</a>, <a class='category' href='/blog/categories/vagrant/'>Vagrant</a>, <a class='category' href='/blog/categories/chef-minitest/'>chef-minitest</a>, <a class='category' href='/blog/categories/chefspec/'>chefspec</a>, <a class='category' href='/blog/categories/minitest/'>minitest</a>, <a class='category' href='/blog/categories/rspec/'>rspec</a>, <a class='category' href='/blog/categories/testing/'>testing</a>
+  
+</span>
+
+
+    </p>
     
-  </header>
-
-
-  <div class="entry-content"><p>It&#8217;s a little puzzling to me that while Chef has the <a href="http://docs.opscode.com/chef/resources.html#remote_file">remote_file</a> resource for downloading files from remote hosts, it doesn&#8217;t have a similar mechanism in the <a href="http://docs.opscode.com/chef/resources.html#remote_file">file</a> resource to copy files as part of a recipe. While there&#8217;s usually a workaround and unnecessary file copies should be discourage in a deploy or configuration pattern, sometimes outside actors beyond our control may place an essential file at an inconvenient and non-configurable location on the filesystem.</p>
-
-<p>One good example of this occurs when a <a href="http://www.vagrantup.com">Vagrant</a> guest with the <a href="http://docs-v1.vagrantup.com/v1/docs/provisioners/chef_server.html">Chef-Server</a> provisioner has the <a href="http://community.opscode.com/cookbooks/chef-cent">chef-client</a> cookbook in the <a href="http://docs.opscode.com/essentials_node_object_run_lists.html">run_list</a>. When Vagrant invokes the Chef-Server provisioner, it writes out a <code>client.rb</code> file to the guest filesystem at <code>/tmp/vagrant-chef-1/client.rb</code>, along with a few others. The provisioner then runs chef-client in the guest VM with the <code>-c /tmp/vagrant-chef-1/client.rb</code> command-line flag, redirecting chef-client to the config file at this location.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>/tmp/vagrant-chef-1
-</span><span class='line'>|-- client.rb
-</span><span class='line'>|-- dna.json
-</span><span class='line'><span class="sb">`</span>-- validation.pem
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>By contrast, when chef-client is started as a daemon by the <code>chef-client::service</code> recipe, chef-client looks for configuration at the location <code>#{node['chef-client']['conf_dir']}/client.rb</code>, which defaults to <code>/etc/chef/client.rb.</code> So what happens if the recipe being tested with Vagrant adds <code>recipe[chef-client::service]</code> to the node&#8217;s run_list?</div>
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://charlesjohnson.github.com/blog/2013/06/10/understanding-chef-testing-part-1/" data-via="chipadeedoodah" data-counturl="http://charlesjohnson.github.com/blog/2013/06/10/understanding-chef-testing-part-1/" >Tweet</a>
   
   
-    <footer>
-      <a rel="full-article" href="/blog/2013/03/12/copying-files-as-part-of-a-chef-recipe/">Read on &rarr;</a>
-    </footer>
   
-
-
-    </article>
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
   
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
 </div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/03/12/copying-files-as-part-of-a-chef-recipe/" title="Previous Post: Copying Files as Part of a Chef Recipe">&laquo; Copying Files as Part of a Chef Recipe</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -347,7 +337,7 @@
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   
   <a href="https://github.com/charlesjohnson">@charlesjohnson</a> on GitHub
@@ -379,6 +369,7 @@
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -393,7 +384,10 @@
       var disqus_shortname = 'chipadeedoodah';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://charlesjohnson.github.com/blog/2013/06/10/understanding-chef-testing-part-1/';
+        var disqus_url = 'http://charlesjohnson.github.com/blog/2013/06/10/understanding-chef-testing-part-1/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
